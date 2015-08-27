@@ -8,7 +8,7 @@ public abstract class Game implements ApplicationListener
     public final TransitionScreen running;
     public final TransitionScreen exiting;
     public TransitionScreen current;
-    
+
     public Screen currentScreen;
 
     public Game()
@@ -44,12 +44,21 @@ public abstract class Game implements ApplicationListener
             current.start();
         }
     }
-    
+
     protected void render(float delta)
     {
         if (current != null)
         {
             current.render(delta);
+        }
+    }
+
+    @Override
+    public void resize(int width, int height)
+    {
+        if (current != null)
+        {
+            current.resize(width, height);
         }
     }
 }

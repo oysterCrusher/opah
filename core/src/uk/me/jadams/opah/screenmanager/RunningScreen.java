@@ -33,8 +33,10 @@ public class RunningScreen implements TransitionScreen
     @Override
     public void resize(int width, int height)
     {
-        // TODO Auto-generated method stub
-
+        if (screen != null)
+        {
+            screen.resize(width, height);
+        }
     }
 
     @Override
