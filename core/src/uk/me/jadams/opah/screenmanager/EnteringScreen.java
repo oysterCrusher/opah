@@ -33,12 +33,17 @@ public class EnteringScreen implements TransitionScreen
         t += delta;
         progress = t / enterTime;
 
+        if (progress > 1.0f)
+        {
+            progress = 1;
+        }
+
         if (screen != null)
         {
             screen.renderEnter(delta, progress);
         }
 
-        if (progress >= 1.0)
+        if (progress >= 1.0f)
         {
             game.setTransitionScreen(game.running);
         }

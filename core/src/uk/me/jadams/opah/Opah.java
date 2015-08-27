@@ -2,14 +2,17 @@ package uk.me.jadams.opah;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import uk.me.jadams.opah.screenmanager.Game;
+import uk.me.jadams.opah.screenmanager.Screen;
+import uk.me.jadams.opah.screens.GameScreen;
 import uk.me.jadams.opah.screens.MenuScreen;
 
 public class Opah extends Game
 {
+    public Screen gameScreen;
+
     SpriteBatch batch;
 
     @Override
@@ -19,6 +22,7 @@ public class Opah extends Game
 
         batch = new SpriteBatch();
 
+        gameScreen = new GameScreen(batch);
         MenuScreen menuScreen = new MenuScreen(this, batch);
         this.setScreen(menuScreen);
     }

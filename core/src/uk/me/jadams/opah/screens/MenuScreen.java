@@ -1,9 +1,5 @@
 package uk.me.jadams.opah.screens;
 
-import uk.me.jadams.opah.Assets;
-import uk.me.jadams.opah.screenmanager.Game;
-import uk.me.jadams.opah.screenmanager.Screen;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -22,19 +18,23 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
+import uk.me.jadams.opah.Assets;
+import uk.me.jadams.opah.Opah;
+import uk.me.jadams.opah.screenmanager.Screen;
+
 public class MenuScreen implements Screen
 {
-    private final Game game;
-    
+    private final Opah game;
+
     private final SpriteBatch batch;
 
     private final Stage stage;
-    
+
     private final OrthographicCamera camera;
-    
+
     private final Texture bg;
 
-    public MenuScreen(Game game, SpriteBatch batch)
+    public MenuScreen(Opah game, SpriteBatch batch)
     {
         this.game = game;
         this.batch = batch;
@@ -43,7 +43,7 @@ public class MenuScreen implements Screen
 
         stage = new Stage(new ExtendViewport(1280, 720, camera), batch);
         stage.setDebugAll(true);
-        
+
         bg = Assets.bg;
         bg.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
     }
@@ -58,13 +58,13 @@ public class MenuScreen implements Screen
         Label title = new Label("Opah", new LabelStyle(Assets.titleFont, Color.valueOf("F26937")));
 
         TextButton playButton = new TextButton("Play", new TextButtonStyle(buttonDrawable, buttonDrawable, buttonDrawable, Assets.titleFont));
-        
+
         playButton.addListener(new ChangeListener()
         {
             @Override
             public void changed(ChangeEvent event, Actor actor)
             {
-                System.out.println("Let's play this fucker!");
+                game.setScreen(game.gameScreen);
             }
         });
 
@@ -75,7 +75,7 @@ public class MenuScreen implements Screen
         mainTable.add(title).pad(40);
         mainTable.row();
         mainTable.add(playButton).pad(40);
-        
+
         stage.addActor(mainTable);
     }
 
@@ -99,21 +99,18 @@ public class MenuScreen implements Screen
     @Override
     public void pause()
     {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     public void resume()
     {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     public void hide()
     {
-        // TODO Auto-generated method stub
 
     }
 
