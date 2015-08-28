@@ -13,7 +13,10 @@ import uk.me.jadams.opah.components.KeyboardMovementComponent;
 import uk.me.jadams.opah.components.PositionComponent;
 import uk.me.jadams.opah.components.SizeComponent;
 import uk.me.jadams.opah.components.TextureComponent;
+import uk.me.jadams.opah.components.VelocityComponent;
 import uk.me.jadams.opah.screenmanager.Screen;
+import uk.me.jadams.opah.systems.InputSystem;
+import uk.me.jadams.opah.systems.MovementSystem;
 import uk.me.jadams.opah.systems.RenderSystem;
 
 public class GameScreen implements Screen
@@ -39,12 +42,15 @@ public class GameScreen implements Screen
         engine = new PooledEngine();
 
         Entity player = engine.createEntity();
-        player.add(new PositionComponent(0, 0));
-        player.add(new SizeComponent(16));
+        player.add(new PositionComponent(0, 0, 0));
+        player.add(new VelocityComponent(0, 0, 50));
+        player.add(new SizeComponent(12));
         player.add(new KeyboardMovementComponent());
         player.add(new TextureComponent(Assets.player));
         engine.addEntity(player);
 
+        engine.addSystem(new InputSystem(camera));
+        engine.addSystem(new MovementSystem());
         engine.addSystem(new RenderSystem(batch));
     }
 
@@ -61,7 +67,8 @@ public class GameScreen implements Screen
         long start = System.currentTimeMillis();
 
         batch.begin();
-        batch.draw(bg, -camera.viewportWidth / 2, -camera.viewportHeight / 2, camera.viewportWidth, camera.viewportHeight, 0, 0, 1, 720 / 32);
+        batch.draw(bg, -camera.viewportWidth / 2, -camera.viewportHeight / 2, camera.viewportWidth,
+                camera.viewportHeight, 0, 0, 1, 720 / 32);
         engine.update(delta);
         batch.end();
 

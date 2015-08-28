@@ -2,18 +2,18 @@ package uk.me.jadams.opah.components;
 
 import com.badlogic.ashley.core.Component;
 
-public class PositionComponent implements Component
+public class VelocityComponent implements Component
 {
     public float x;
 
     public float y;
 
-    public float a;
+    public float max;
 
-    public PositionComponent(float x, float y, float a)
+    public VelocityComponent(float x, float y, float max)
     {
         this.x = x;
         this.y = y;
-        this.a = a;
+        this.max = max;
     }
 }
