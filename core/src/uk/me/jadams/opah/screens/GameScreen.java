@@ -7,14 +7,19 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 
 import uk.me.jadams.opah.Assets;
+import uk.me.jadams.opah.Boundary;
+import uk.me.jadams.opah.components.AutoFireComponent;
+import uk.me.jadams.opah.components.BoundaryCollisionComponent;
 import uk.me.jadams.opah.components.KeyboardMovementComponent;
 import uk.me.jadams.opah.components.PositionComponent;
 import uk.me.jadams.opah.components.SizeComponent;
 import uk.me.jadams.opah.components.TextureComponent;
 import uk.me.jadams.opah.components.VelocityComponent;
 import uk.me.jadams.opah.screenmanager.Screen;
+import uk.me.jadams.opah.systems.FiringSystem;
 import uk.me.jadams.opah.systems.InputSystem;
 import uk.me.jadams.opah.systems.MovementSystem;
 import uk.me.jadams.opah.systems.RenderSystem;
@@ -29,6 +34,8 @@ public class GameScreen implements Screen
 
     private final Texture bg;
 
+    private final Boundary boundary;
+
     public GameScreen(SpriteBatch batch)
     {
         this.batch = batch;
@@ -41,17 +48,33 @@ public class GameScreen implements Screen
 
         engine = new PooledEngine();
 
+        // Create the player entity.
         Entity player = engine.createEntity();
         player.add(new PositionComponent(0, 0, 0));
         player.add(new VelocityComponent(0, 0, 50));
         player.add(new SizeComponent(12));
         player.add(new KeyboardMovementComponent());
         player.add(new TextureComponent(Assets.player));
+        player.add(new AutoFireComponent(0.5f));
+        player.add(new BoundaryCollisionComponent(false));
         engine.addEntity(player);
+
+        // Create the boundary walls.
+        Vector2[] vertices = new Vector2[8];
+        vertices[0] = new Vector2(-400, 0);
+        vertices[1] = new Vector2(-300, 250);
+        vertices[2] = new Vector2(0, 320);
+        vertices[3] = new Vector2(300, 250);
+        vertices[4] = new Vector2(400, 0);
+        vertices[5] = new Vector2(300, -250);
+        vertices[6] = new Vector2(0, -320);
+        vertices[7] = new Vector2(-300, -250);
+        boundary = new Boundary(vertices);
 
         engine.addSystem(new InputSystem(camera));
         engine.addSystem(new MovementSystem());
         engine.addSystem(new RenderSystem(batch));
+        engine.addSystem(new FiringSystem(engine));
     }
 
     @Override
@@ -65,13 +88,14 @@ public class GameScreen implements Screen
     public void render(float delta)
     {
         long start = System.currentTimeMillis();
-
+        
         batch.begin();
         batch.draw(bg, -camera.viewportWidth / 2, -camera.viewportHeight / 2, camera.viewportWidth,
                 camera.viewportHeight, 0, 0, 1, 720 / 32);
+        boundary.render(batch);
         engine.update(delta);
         batch.end();
-
+        
         long end = System.currentTimeMillis();
 
         if (end - start > 10)
