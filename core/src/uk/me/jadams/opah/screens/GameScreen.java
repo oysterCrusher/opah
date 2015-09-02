@@ -1,14 +1,5 @@
 package uk.me.jadams.opah.screens;
 
-import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.PooledEngine;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureWrap;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Vector2;
-
 import uk.me.jadams.opah.Assets;
 import uk.me.jadams.opah.Boundary;
 import uk.me.jadams.opah.components.AutoFireComponent;
@@ -19,10 +10,20 @@ import uk.me.jadams.opah.components.SizeComponent;
 import uk.me.jadams.opah.components.TextureComponent;
 import uk.me.jadams.opah.components.VelocityComponent;
 import uk.me.jadams.opah.screenmanager.Screen;
+import uk.me.jadams.opah.systems.BoundaryCollisionSystem;
 import uk.me.jadams.opah.systems.FiringSystem;
 import uk.me.jadams.opah.systems.InputSystem;
 import uk.me.jadams.opah.systems.MovementSystem;
 import uk.me.jadams.opah.systems.RenderSystem;
+
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.PooledEngine;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureWrap;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 
 public class GameScreen implements Screen
 {
@@ -71,8 +72,10 @@ public class GameScreen implements Screen
         vertices[7] = new Vector2(-300, -250);
         boundary = new Boundary(vertices);
 
+        // Add the systems.
         engine.addSystem(new InputSystem(camera));
         engine.addSystem(new MovementSystem());
+        engine.addSystem(new BoundaryCollisionSystem(boundary));
         engine.addSystem(new RenderSystem(batch));
         engine.addSystem(new FiringSystem(engine));
     }
@@ -87,6 +90,9 @@ public class GameScreen implements Screen
     @Override
     public void render(float delta)
     {
+        // Just fix timestep at 60hz for now.
+        delta = 1 / 60f;
+
         long start = System.currentTimeMillis();
         
         batch.begin();

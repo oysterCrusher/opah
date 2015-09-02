@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.Component;
 
 public class BoundaryCollisionComponent implements Component
 {
-    boolean bounce;
+    public boolean bounce;
     
     public BoundaryCollisionComponent(boolean bounce)
     {
