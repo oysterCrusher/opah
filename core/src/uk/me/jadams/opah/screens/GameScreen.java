@@ -1,7 +1,17 @@
 package uk.me.jadams.opah.screens;
 
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.PooledEngine;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureWrap;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
+
 import uk.me.jadams.opah.Assets;
 import uk.me.jadams.opah.Boundary;
+import uk.me.jadams.opah.ParticleEffects;
 import uk.me.jadams.opah.components.AutoFireComponent;
 import uk.me.jadams.opah.components.BoundaryCollisionComponent;
 import uk.me.jadams.opah.components.KeyboardMovementComponent;
@@ -16,15 +26,6 @@ import uk.me.jadams.opah.systems.InputSystem;
 import uk.me.jadams.opah.systems.MovementSystem;
 import uk.me.jadams.opah.systems.RenderSystem;
 
-import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.PooledEngine;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureWrap;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Vector2;
-
 public class GameScreen implements Screen
 {
     private final SpriteBatch batch;
@@ -36,6 +37,8 @@ public class GameScreen implements Screen
     private final Texture bg;
 
     private final Boundary boundary;
+    
+    private final ParticleEffects particleEffects;
 
     public GameScreen(SpriteBatch batch)
     {
@@ -48,6 +51,8 @@ public class GameScreen implements Screen
         bg.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 
         engine = new PooledEngine();
+        
+        particleEffects = new ParticleEffects();
 
         // Create the player entity.
         Entity player = engine.createEntity();
@@ -75,7 +80,7 @@ public class GameScreen implements Screen
         // Add the systems.
         engine.addSystem(new InputSystem(camera));
         engine.addSystem(new MovementSystem());
-        engine.addSystem(new BoundaryCollisionSystem(boundary));
+        engine.addSystem(new BoundaryCollisionSystem(boundary, particleEffects));
         engine.addSystem(new RenderSystem(batch));
         engine.addSystem(new FiringSystem(engine));
     }
@@ -98,6 +103,7 @@ public class GameScreen implements Screen
         batch.begin();
         batch.draw(bg, -camera.viewportWidth / 2, -camera.viewportHeight / 2, camera.viewportWidth,
                 camera.viewportHeight, 0, 0, 1, 720 / 32);
+        particleEffects.render(batch, delta);
         boundary.render(batch);
         engine.update(delta);
         batch.end();

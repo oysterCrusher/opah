@@ -32,7 +32,7 @@ public class Joint
         h = (int) Math.max(y0, Math.max(y1, y2)) + 1;
 
         Pixmap pixmap = new Pixmap(w, h, Format.RGBA8888);
-        pixmap.setColor(Color.valueOf("FF1EB7"));
+        pixmap.setColor(Color.valueOf("CCCCCC"));
 //        pixmap.setColor(Color.GREEN);
 
         pixmap.fillTriangle((int) x0, (int) (h - y0), (int) x1, (int) (h - y1), (int) x2, (int) (h - y2));

@@ -1,6 +1,7 @@
 package uk.me.jadams.opah.systems;
 
 import uk.me.jadams.opah.Boundary;
+import uk.me.jadams.opah.ParticleEffects;
 import uk.me.jadams.opah.Wall;
 import uk.me.jadams.opah.components.BoundaryCollisionComponent;
 import uk.me.jadams.opah.components.PositionComponent;
@@ -24,13 +25,16 @@ public class BoundaryCollisionSystem extends IteratingSystem
     private final ComponentMapper<BoundaryCollisionComponent> bcMap = ComponentMapper.getFor(BoundaryCollisionComponent.class);
 
     private final Boundary boundary;
+    
+    private final ParticleEffects effects;
 
     @SuppressWarnings("unchecked")
-    public BoundaryCollisionSystem(Boundary boundary)
+    public BoundaryCollisionSystem(Boundary boundary, ParticleEffects effects)
     {
         super(Family.all(PositionComponent.class, SizeComponent.class, VelocityComponent.class, BoundaryCollisionComponent.class).get());
 
         this.boundary = boundary;
+        this.effects = effects;
     }
 
     @Override
@@ -55,6 +59,8 @@ public class BoundaryCollisionSystem extends IteratingSystem
                 reflection = wall.reflectV(vel.x, vel.y, bc.bounce);
                 vel.x = reflection.x;
                 vel.y = reflection.y;
+
+                effects.bulletBounce(pos.x, pos.y);
             }
         }
     }

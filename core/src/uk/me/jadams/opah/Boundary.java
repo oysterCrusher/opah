@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Boundary implements Iterable<Wall>
 {
-    private static final float W = 16f;
+    private static final float W = 8f;
 
     private final Wall[] walls;
 
