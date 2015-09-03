@@ -11,7 +11,8 @@ public class Wall
     private final float y0;
     private final float x1;
     private final float y1;
-    private final Vector2 nor;
+    private final Vector2 nor; // Unit vector normal to boundary, angled inwards.
+    private final Vector2 v; // Unit vector along boundary.
 
     float angle;
 
@@ -27,6 +28,8 @@ public class Wall
         angle = a.angle();
         
         nor = new Vector2(x1 - x0, y1 - y0).rotate90(1).nor();
+        
+        v = new Vector2(x1 - x0, y1 - y0).nor();
     }
     
     public Vector2 getOuterPoint0()
@@ -63,7 +66,22 @@ public class Wall
         return ((xr1 - xr0) * (y - yr0) - (yr1 - yr0) * (x - xr0)) > r;
     }
     
-    public Vector2 reflect(float x, float y, float r, boolean bounce)
+    public Vector2 enclose(float x, float y, float r)
+    {
+        float xr0 = x0 - nor.x * r;
+        float yr0 = y0 - nor.y * r;
+
+        Vector2 result = new Vector2();
+        
+        float A = (x - xr0) * v.x + (y - yr0) * v.y;
+        
+        result.x = xr0 + A * v.x;
+        result.y = yr0 + A * v.y;
+        
+        return result;
+    }
+    
+    public Vector2 reflect(float x, float y, float r)
     {
         float xr0 = x0 - nor.x * r;
         float yr0 = y0 - nor.y * r;

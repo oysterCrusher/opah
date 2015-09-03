@@ -50,17 +50,32 @@ public class BoundaryCollisionSystem extends IteratingSystem
             // If we're about to move outside the boundary.
             if (wall.isOutside(pos.x, pos.y, size.r))
             {
-                // Our new position is reflected in the boundary.
-                Vector2 reflection = wall.reflect(pos.x, pos.y, size.r, bc.bounce);
-                pos.x = reflection.x;
-                pos.y = reflection.y;
-                
-                // Our new velocity is the old velocity reflected in the boundary axis.
-                reflection = wall.reflectV(vel.x, vel.y, bc.bounce);
-                vel.x = reflection.x;
-                vel.y = reflection.y;
-
-                effects.bulletBounce(pos.x, pos.y);
+                if (bc.bounce)
+                {
+                    // Everyone loves particle effects.
+                    effects.bulletBounce(pos.x, pos.y, vel.x, vel.y);
+                    
+                    // Our new position is reflected in the boundary.
+                    Vector2 reflection = wall.reflect(pos.x, pos.y, size.r);
+                    pos.x = reflection.x;
+                    pos.y = reflection.y;
+                    
+                    // Our new velocity is the old velocity reflected in the boundary axis.
+                    reflection = wall.reflectV(vel.x, vel.y, bc.bounce);
+                    vel.x = reflection.x;
+                    vel.y = reflection.y;
+                }
+                else
+                {
+                    // Our new position is us pushed back to just within the boundary.
+                    Vector2 position = wall.enclose(pos.x, pos.y, size.r);
+                    pos.x = position.x;
+                    pos.y = position.y;
+                    
+                    // TODO - Restrict velocity normal to the boundary? Essentially zero restitution? 
+                    vel.x = 0;
+                    vel.y = 0;
+                }
             }
         }
     }

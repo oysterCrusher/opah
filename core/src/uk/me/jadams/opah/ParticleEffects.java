@@ -11,9 +11,9 @@ public class ParticleEffects
         bullet_bounce = new Particle("bullet_bounce.p");
     }
     
-    public void bulletBounce(float x, float y)
+    public void bulletBounce(float x, float y, float vx, float vy)
     {
-        bullet_bounce.start(x, y);
+        bullet_bounce.start(x, y, vx, vy);
     }
     
     public void render(SpriteBatch batch, float delta)

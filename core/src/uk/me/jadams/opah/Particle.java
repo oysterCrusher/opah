@@ -3,8 +3,10 @@ package uk.me.jadams.opah;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
+import com.badlogic.gdx.graphics.g2d.ParticleEmitter;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
 public class Particle
@@ -25,10 +27,18 @@ public class Particle
         effects = new Array<PooledEffect>();
     }
     
-    public void start(float x, float y)
+    public void start(float x, float y, float vx, float vy)
     {
         PooledEffect effect = pool.obtain();
         effect.setPosition(x, y);
+        
+        float aMin = new Vector2(vx, vy).angle();
+        
+        for (ParticleEmitter emitter : effect.getEmitters())
+        {
+            emitter.getAngle().setHigh(aMin - 20, aMin + 20);
+        }
+
         effects.add(effect);
     }
     
