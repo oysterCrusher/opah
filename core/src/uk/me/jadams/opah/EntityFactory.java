@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.math.MathUtils;
 
 import uk.me.jadams.opah.components.BoundaryCollisionComponent;
+import uk.me.jadams.opah.components.BulletComponent;
 import uk.me.jadams.opah.components.PositionComponent;
 import uk.me.jadams.opah.components.SizeComponent;
 import uk.me.jadams.opah.components.TextureComponent;
@@ -26,6 +27,7 @@ public class EntityFactory
         bullet.add(new TextureComponent(Assets.bullet));
         bullet.add(new VelocityComponent(vx, vy, BULLET_SPEED));
         bullet.add(new BoundaryCollisionComponent(true));
+        bullet.add(new BulletComponent());
         engine.addEntity(bullet);
         return bullet;
     }

@@ -21,6 +21,7 @@ import uk.me.jadams.opah.components.TextureComponent;
 import uk.me.jadams.opah.components.VelocityComponent;
 import uk.me.jadams.opah.screenmanager.Screen;
 import uk.me.jadams.opah.systems.BoundaryCollisionSystem;
+import uk.me.jadams.opah.systems.BulletCollisionSystem;
 import uk.me.jadams.opah.systems.FiringSystem;
 import uk.me.jadams.opah.systems.InputSystem;
 import uk.me.jadams.opah.systems.MovementSystem;
@@ -81,6 +82,7 @@ public class GameScreen implements Screen
         engine.addSystem(new InputSystem(camera));
         engine.addSystem(new MovementSystem());
         engine.addSystem(new BoundaryCollisionSystem(boundary, particleEffects));
+        engine.addSystem(new BulletCollisionSystem());
         engine.addSystem(new RenderSystem(batch));
         engine.addSystem(new FiringSystem(engine));
     }
