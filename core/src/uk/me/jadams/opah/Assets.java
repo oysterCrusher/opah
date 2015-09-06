@@ -8,9 +8,10 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 public class Assets
 {
     public static Texture player;
+    public static Texture turret;
     public static Texture bullet;
     public static Texture bg;
-    
+
     public static TextureRegion region;
 
     public static BitmapFont titleFont;
@@ -29,9 +30,11 @@ public class Assets
     {
         player = loadTexture("images/player.png");
         bullet = loadTexture("images/bullet.png");
+        turret = loadTexture("images/turret.png");
         bg = loadTexture("images/bg.png");
+
         titleFont = loadFont("fonts/bpdotssquares120.fnt");
-        
+
         region = new TextureRegion(player);
     }
 }

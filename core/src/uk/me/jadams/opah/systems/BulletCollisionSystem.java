@@ -1,5 +1,6 @@
 package uk.me.jadams.opah.systems;
 
+import uk.me.jadams.opah.World;
 import uk.me.jadams.opah.components.BulletComponent;
 import uk.me.jadams.opah.components.KeyboardMovementComponent;
 import uk.me.jadams.opah.components.PositionComponent;
@@ -14,6 +15,8 @@ import com.badlogic.ashley.utils.ImmutableArray;
 
 public class BulletCollisionSystem extends EntitySystem
 {
+    private final World world;
+
     private final ComponentMapper<PositionComponent> posMap;
     
     private final ComponentMapper<SizeComponent> sizeMap;
@@ -24,8 +27,10 @@ public class BulletCollisionSystem extends EntitySystem
     
     private Engine engine;
     
-    public BulletCollisionSystem()
+    public BulletCollisionSystem(World  world)
     {
+        this.world = world;
+
         posMap = ComponentMapper.getFor(PositionComponent.class);
         sizeMap = ComponentMapper.getFor(SizeComponent.class);
     }
@@ -60,6 +65,7 @@ public class BulletCollisionSystem extends EntitySystem
                 if (overlaps(bPos.x, bPos.y, bSize.r, pPos.x, pPos.y, pSize.r))
                 {
                     engine.removeEntity(player);
+                    world.gameOver();
                 }
             }
         }

@@ -2,10 +2,7 @@ package uk.me.jadams.opah.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureWrap;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -16,36 +13,28 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.BaseDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 import uk.me.jadams.opah.Assets;
 import uk.me.jadams.opah.Opah;
+import uk.me.jadams.opah.World;
 import uk.me.jadams.opah.screenmanager.Screen;
 
 public class MenuScreen implements Screen
 {
     private final Opah game;
 
-    private final SpriteBatch batch;
+    private final World world;
 
     private final Stage stage;
 
-    private final OrthographicCamera camera;
-
-    private final Texture bg;
-
-    public MenuScreen(Opah game, SpriteBatch batch)
+    public MenuScreen(Opah game, World world, Viewport viewport)
     {
         this.game = game;
-        this.batch = batch;
+        this.world = world;
 
-        camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-
-        stage = new Stage(new ExtendViewport(1280, 720, camera), batch);
+        stage = new Stage(viewport);
         stage.setDebugAll(true);
-
-        bg = Assets.bg;
-        bg.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
     }
 
     @Override
@@ -55,10 +44,10 @@ public class MenuScreen implements Screen
 
         Drawable buttonDrawable = new BaseDrawable();
 
-        Label title = new Label("Opah", new LabelStyle(Assets.titleFont, Color.valueOf("F26937")));
+        Label title = new Label("Opah", new LabelStyle(Assets.titleFont, Color.valueOf("CCCCCC")));
 
+        // Play button.
         TextButton playButton = new TextButton("Play", new TextButtonStyle(buttonDrawable, buttonDrawable, buttonDrawable, Assets.titleFont));
-
         playButton.addListener(new ChangeListener()
         {
             @Override
@@ -68,11 +57,54 @@ public class MenuScreen implements Screen
             }
         });
 
+        // Boundary one button.
+        final Vector2[] verticesOne = new Vector2[8];
+        verticesOne[0] = new Vector2(-300, 0);
+        verticesOne[1] = new Vector2(-300, 250);
+        verticesOne[2] = new Vector2(0, 320);
+        verticesOne[3] = new Vector2(300, 250);
+        verticesOne[4] = new Vector2(300, 0);
+        verticesOne[5] = new Vector2(300, -250);
+        verticesOne[6] = new Vector2(0, -320);
+        verticesOne[7] = new Vector2(-300, -250);
+        TextButton boundaryOne = new TextButton("A", new TextButtonStyle(buttonDrawable, buttonDrawable, buttonDrawable, Assets.titleFont));
+        boundaryOne.addListener(new ChangeListener()
+        {
+            @Override
+            public void changed(ChangeEvent event, Actor actor)
+            {
+                world.moveBoundaries(verticesOne);
+            }
+        });
+
+        // Boundary two button.
+        final Vector2[] verticesTwo = new Vector2[8];
+        verticesTwo[0] = new Vector2(-400, 0);
+        verticesTwo[1] = new Vector2(-300, 250);
+        verticesTwo[2] = new Vector2(0, 320);
+        verticesTwo[3] = new Vector2(300, 250);
+        verticesTwo[4] = new Vector2(400, 0);
+        verticesTwo[5] = new Vector2(300, -250);
+        verticesTwo[6] = new Vector2(0, -320);
+        verticesTwo[7] = new Vector2(-300, -250);
+        TextButton boundaryTwo = new TextButton("B", new TextButtonStyle(buttonDrawable, buttonDrawable, buttonDrawable, Assets.titleFont));
+        boundaryTwo.addListener(new ChangeListener()
+        {
+            @Override
+            public void changed(ChangeEvent event, Actor actor)
+            {
+                world.moveBoundaries(verticesTwo);
+            }
+        });
+
         Table mainTable = new Table();
         mainTable.setFillParent(true);
         mainTable.center();
 
         mainTable.add(title).pad(40);
+        mainTable.row();
+        mainTable.add(boundaryOne);
+        mainTable.add(boundaryTwo);
         mainTable.row();
         mainTable.add(playButton).pad(40);
 
@@ -82,10 +114,6 @@ public class MenuScreen implements Screen
     @Override
     public void render(float delta)
     {
-        batch.begin();
-        batch.draw(bg, 0, 0, stage.getViewport().getWorldWidth(), stage.getViewport().getWorldHeight(), 0, 0, 1, 720 / 32);
-        batch.end();
-
         stage.act();
         stage.draw();
     }
@@ -93,7 +121,7 @@ public class MenuScreen implements Screen
     @Override
     public void resize(int width, int height)
     {
-        stage.getViewport().update(width, height, true);
+
     }
 
     @Override
@@ -123,7 +151,7 @@ public class MenuScreen implements Screen
     @Override
     public float getEnterTime()
     {
-        return 1;
+        return 0;
     }
 
     @Override
@@ -135,11 +163,6 @@ public class MenuScreen implements Screen
     @Override
     public void renderEnter(float delta, float progress)
     {
-        batch.begin();
-        batch.setColor(1, 1, 1, progress);
-        batch.draw(bg, 0, 0, stage.getViewport().getWorldWidth(), stage.getViewport().getWorldHeight(), 0, 0, 1, 720 / 32);
-        batch.end();
-
         stage.act();
         stage.draw();
     }
