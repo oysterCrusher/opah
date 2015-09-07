@@ -1,21 +1,8 @@
 package uk.me.jadams.opah;
 
-import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.PooledEngine;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureWrap;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Vector2;
-
-import uk.me.jadams.opah.components.AutoFireComponent;
-import uk.me.jadams.opah.components.BoundaryCollisionComponent;
-import uk.me.jadams.opah.components.KeyboardMovementComponent;
-import uk.me.jadams.opah.components.PositionComponent;
-import uk.me.jadams.opah.components.SizeComponent;
-import uk.me.jadams.opah.components.TargetPlayerComponent;
-import uk.me.jadams.opah.components.TextureComponent;
-import uk.me.jadams.opah.components.VelocityComponent;
+import uk.me.jadams.opah.stages.Stage;
+import uk.me.jadams.opah.stages.StageA;
+import uk.me.jadams.opah.stages.StageB;
 import uk.me.jadams.opah.systems.BoundaryCollisionSystem;
 import uk.me.jadams.opah.systems.BulletCollisionSystem;
 import uk.me.jadams.opah.systems.FiringSystem;
@@ -24,8 +11,23 @@ import uk.me.jadams.opah.systems.MovementSystem;
 import uk.me.jadams.opah.systems.RenderSystem;
 import uk.me.jadams.opah.systems.TargetingSystem;
 
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.PooledEngine;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureWrap;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
+
 public class World
 {
+    private final Stage stageA;
+
+    private final Stage stageB;
+
+    private Stage currentStage;
+
     private final SpriteBatch batch;
 
     private final OrthographicCamera camera;
@@ -38,9 +40,11 @@ public class World
 
     private final Texture bg;
 
+    private final Timer timer;
+
     private Entity player;
 
-    private Entity turret;
+    private final Array<Entity> turrets;
 
     private boolean complete;
 
@@ -56,18 +60,12 @@ public class World
 
         engine = new PooledEngine();
 
-        // Create the boundary walls.
-        Vector2[] vertices = new Vector2[8];
-        vertices[0] = new Vector2(-400, 0);
-        vertices[1] = new Vector2(-300, 250);
-        vertices[2] = new Vector2(0, 320);
-        vertices[3] = new Vector2(300, 250);
-        vertices[4] = new Vector2(400, 0);
-        vertices[5] = new Vector2(300, -250);
-        vertices[6] = new Vector2(0, -320);
-        vertices[7] = new Vector2(-300, -250);
-        boundary = new Boundary(vertices);
-        moveBoundaries(vertices);
+        stageA = new StageA(0);
+        stageB = new StageB(0);
+        currentStage = stageA;
+
+        boundary = new Boundary(currentStage.getVertices());
+        stageA();
 
         // Add the systems.
         engine.addSystem(new InputSystem(camera));
@@ -77,17 +75,24 @@ public class World
         engine.addSystem(new BulletCollisionSystem(this));
         engine.addSystem(new RenderSystem(batch));
         engine.addSystem(new FiringSystem(engine));
+
+        timer = new Timer();
+
+        turrets = new Array<Entity>();
     }
 
     public void render(float delta)
     {
         batch.begin();
 
-        batch.draw(bg, -camera.viewportWidth / 2, -camera.viewportHeight / 2, camera.viewportWidth, camera.viewportHeight, 0, 0, 1, 720 / 32);
+        batch.draw(bg, -camera.viewportWidth / 2, -camera.viewportHeight / 2, camera.viewportWidth,
+                camera.viewportHeight, 0, 0, 1, 720 / 32);
 
         particleEffects.render(batch, delta);
         boundary.render(batch, delta);
         engine.update(delta);
+
+        timer.update(delta);
 
         batch.end();
     }
@@ -97,35 +102,39 @@ public class World
         engine.removeAllEntities();
 
         // Create the player entity.
-        player = engine.createEntity();
-        player.add(new PositionComponent(0, 0, 0));
-        player.add(new VelocityComponent(0, 0, 50));
-        player.add(new SizeComponent(12));
-        player.add(new KeyboardMovementComponent());
-        player.add(new TextureComponent(Assets.player));
-        player.add(new BoundaryCollisionComponent(false));
-        engine.addEntity(player);
+        player = EntityFactory.player(engine, 0, 0);
 
-        // Create a turret.
-        turret = engine.createEntity();
-        turret.add(new PositionComponent(-100f, 0, 0));
-        turret.add(new SizeComponent(16f));
-        turret.add(new TextureComponent(Assets.turret));
-        turret.add(new AutoFireComponent(0.4f));
-        turret.add(new TargetPlayerComponent(player));
-        engine.addEntity(turret);
+        // Create the turrets.
+        turrets.clear();
+        for (Vector2 turret : currentStage.getTurrets())
+        {
+            turrets.add(EntityFactory.turret(engine, turret.x, turret.y, player));
+        }
 
+        timer.start();
         complete = false;
     }
 
-    public void moveBoundaries(Vector2[] vertices)
+    public void stageA()
     {
-        boundary.transitionTo(vertices);
+        currentStage = stageA;
+        boundary.transitionTo(currentStage.getVertices());
+    }
+
+    public void stageB()
+    {
+        currentStage = stageB;
+        boundary.transitionTo(currentStage.getVertices());
     }
 
     public void gameOver()
     {
-        engine.removeEntity(turret);
+        for (Entity turret : turrets)
+        {
+            engine.removeEntity(turret);
+        }
+
+        timer.stop();
         complete = true;
     }
 
